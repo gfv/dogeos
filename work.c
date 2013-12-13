@@ -40,6 +40,11 @@ void* memmove(void * to, const void * from, size_t num) {
 }
     
 
+void set_cursor(int x, int y) {
+    cursor_x = x;
+    cursor_y = y;
+}
+
 void clear_screen() {
     int i;
     for (i = 0; i < (80 * 25 * 2); ++i) videomem[i] = (char)0;
@@ -50,7 +55,7 @@ void scroll_screen() {
 }
 
 void write_char(const char ch, const char attr) {
-    if (ch == 0x10) {
+    if (ch == 0x0a) {
         ++cursor_y;
         cursor_x = 0;
         if (cursor_y >= 24) {

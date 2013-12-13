@@ -11,6 +11,7 @@ extrn 'memmove' as memmove
 extrn 'write_string' as write_string
 extrn 'write_char' as write_char
 extrn 'clear_screen' as clear_screen
+extrn 'set_cursor' as set_cursor
 
 macro log msg {
   local J
@@ -39,9 +40,35 @@ _start:
         sti
         call clear_screen        
 ; this is real now!
-        log <"flight operating normally", 0x10>
+        log <"flight operating normally", 0x0a>
 
-
+        mov ecx, doge_size
+        mov esi, doge
+        mov edi, 0xb8000
+        mov ebx, 80
+.doge_loop:
+        ;         wow
+        ; such loop
+        ;                much doge
+        lodsb
+        cmp al, 0x0a
+        je .next_line
+        stosb
+        mov al, 0x0f
+        stosb
+        dec ebx
+        loop .doge_loop
+        jmp hang
+.next_line:
+        shl ebx, 1
+        add edi, ebx
+        mov ebx, 80
+        loop .doge_loop
+        
+        push 24
+        push 0
+        call set_cursor
+        add esp, 8
 ; and now for something completely different
         mov eax, cr4
         or eax, (1b shl 5) ; enabling PAE
@@ -98,4 +125,7 @@ idt_descriptor:
 gdt_descriptor:
         .limit:   dw gdt_length
         .base:    dd gdt
-       
+
+doge:
+file 'doge.bin'
+doge_size = $ - doge       
